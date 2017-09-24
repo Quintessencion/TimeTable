@@ -36,8 +36,6 @@ public class DownloadTimeTableThread extends AsyncTask<String, Object, List<Teac
         super.onPreExecute();
         mainActivity.progressBar.setVisibility(ProgressBar.VISIBLE);
         mainActivity.textError.setText(error);
-        mainActivity.scrollHor.scrollTo(0, 0);
-        mainActivity.scrollVer.scrollTo(0, 0);
     }
 
     @Override
@@ -79,18 +77,19 @@ public class DownloadTimeTableThread extends AsyncTask<String, Object, List<Teac
         mainActivity.textError.setText(error);
         error = "";
 
-        fillData(teachers);
+        fillData(teachers);//заполнение таблицы
+        //обнуление скроллов
+        mainActivity.scrollHor.scrollTo(0, 0);
+        mainActivity.scrollVer.scrollTo(0, 0);
     }
 
     private void fillData(List<Teacher> list) {
         mainActivity.tableLayout.removeAllViews();
 
-        if (list == null) {
-            return;
-        }
-        if (list.isEmpty()) {
-            mainActivity.restText.setText("По ходу выходной");
-        } else mainActivity.restText.setText("");
+        if (list == null) return;
+
+        if (list.isEmpty()) mainActivity.restText.setText("По ходу выходной");
+        else mainActivity.restText.setText("");
 
         int count = 0;
 
@@ -111,8 +110,7 @@ public class DownloadTimeTableThread extends AsyncTask<String, Object, List<Teac
     private void fillTable(Teacher t, int count) {
         TableRow tr = new TableRow(mainActivity);
 
-        if (count % 2 == 0)
-            tr.setBackgroundResource(R.color.colorWhite);//установка фона на четные ряды
+        if (count % 2 == 0) tr.setBackgroundResource(R.color.colorWhite);//установка фона на четные ряды
 
         createTextViewAndFillData(tr, t.getLessonNumber() + " урок");
         createTextViewAndFillData(tr, t.getTimeLesson());

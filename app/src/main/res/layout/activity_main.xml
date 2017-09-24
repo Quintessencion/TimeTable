@@ -17,7 +17,6 @@
         android:orientation="horizontal">
 
         <EditText
-            android:text="Гардер"
             android:id="@+id/tvInputSearchText"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
