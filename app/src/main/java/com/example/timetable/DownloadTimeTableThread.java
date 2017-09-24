@@ -43,7 +43,14 @@ public class DownloadTimeTableThread extends AsyncTask<String, Object, List<Teac
     @Override
     protected List<Teacher> doInBackground(String... uri) {
         Document doc;
-        if (uri[1].isEmpty() || uri[1] == null) return null;
+        String inputText;
+
+        if (uri[1].isEmpty() || uri[1] == null) {
+            return null;
+        } else {
+            inputText = uri[1].toLowerCase();
+            inputText = inputText.substring(0, 1).toUpperCase() + inputText.substring(1);//делает первую букву заглавной
+        }
 
         if (!mainActivity.isOnline()) {
             error = "Отсутствует подключение к интернету!";
@@ -55,7 +62,7 @@ public class DownloadTimeTableThread extends AsyncTask<String, Object, List<Teac
 
             dayOfTheWeak = doc.select("tr").get(1).text().split(" ")[0];//день недели
 //            Log.d("myTags", doc.select("tr").get(1).text().split(" ")[0]);//день недели
-            return parsingTable(doc, uri[1]);
+            return parsingTable(doc, inputText);
 
         } catch (IOException e) {
 //            error = "Отсутствует подключение к интернету или неверный URI!";
@@ -107,20 +114,20 @@ public class DownloadTimeTableThread extends AsyncTask<String, Object, List<Teac
         if (count % 2 == 0)
             tr.setBackgroundResource(R.color.colorWhite);//установка фона на четные ряды
 
-        createTextVievAndFillData(tr, t.getLessonNumber() + " урок");
-        createTextVievAndFillData(tr, t.getTimeLesson());
-        createTextVievAndFillData(tr, t.getSerNameTeacher());
-        createTextVievAndFillData(tr, t.getCabinetNumber());
-        createTextVievAndFillData(tr, t.getLesson());
+        createTextViewAndFillData(tr, t.getLessonNumber() + " урок");
+        createTextViewAndFillData(tr, t.getTimeLesson());
+        createTextViewAndFillData(tr, t.getSerNameTeacher());
+        createTextViewAndFillData(tr, t.getCabinetNumber());
+        createTextViewAndFillData(tr, t.getLesson());
 
         mainActivity.tableLayout.addView(tr);
     }
 
-    private void createTextVievAndFillData(TableRow tr, String s) {
+    private void createTextViewAndFillData(TableRow tr, String s) {
         TextView tv = new TextView(mainActivity);
         tv.setTextSize(20);
 
-        if (s.contains(mainActivity.tvInputSearchText.getText())) {
+        if (s.toLowerCase().contains(mainActivity.tvInputSearchText.getText().toString().toLowerCase())) {
             tv.setTextColor(Color.BLACK);
         }
 
