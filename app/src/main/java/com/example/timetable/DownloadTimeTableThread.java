@@ -36,6 +36,8 @@ public class DownloadTimeTableThread extends AsyncTask<String, Object, List<Teac
         super.onPreExecute();
         mainActivity.progressBar.setVisibility(ProgressBar.VISIBLE);
         mainActivity.textError.setText(error);
+        mainActivity.scrollHor.scrollTo(0, 0);
+        mainActivity.scrollVer.scrollTo(0, 0);
     }
 
     @Override
@@ -126,7 +128,7 @@ public class DownloadTimeTableThread extends AsyncTask<String, Object, List<Teac
         tr.addView(tv);
     }
 
-
+    //распарсивание аштиэмэльки
     private List<Teacher> parsingTable(Document doc, String inputText) {
         List<Teacher> listTeacher = new ArrayList<>();
         Teacher teacher;

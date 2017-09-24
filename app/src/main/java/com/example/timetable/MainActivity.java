@@ -10,8 +10,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -30,6 +32,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     TextView textError;
     TextView restText;
     TableLayout tableLayout;
+    HorizontalScrollView scrollHor;
+    ScrollView scrollVer;
 
 
     //Functions
@@ -54,6 +58,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         tableLayout = (TableLayout) findViewById(R.id.tableLayout);
         textError = (TextView) findViewById(R.id.tvError);
         restText = (TextView) findViewById(R.id.tvRestText);
+        scrollHor = (HorizontalScrollView) findViewById(R.id.scrollHor);
+        scrollVer = (ScrollView) findViewById(R.id.scrollVer);
     }
 
     //обработка нажатия кнопки
