@@ -1,13 +1,11 @@
 package com.example.timetable;
 
 import android.content.Context;
-import android.content.pm.ActivityInfo;
-import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.HorizontalScrollView;
@@ -15,18 +13,17 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TableLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
 
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+
+import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     //Fields
     EditText tvInputSearchText;
-    ImageButton btnSearch;
+    private ImageButton btnSearch;
     ProgressBar progressBar;
     TextView dayOfTheWeak;
     TextView textError;
@@ -34,6 +31,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     TableLayout tableLayout;
     HorizontalScrollView scrollHor;
     ScrollView scrollVer;
+
+    private String URI = "http://91.232.173.137:8083/izmenenie/izmenenie.html";
+    private String error;
+    private DownloadTimeTableThread dttt;
+    private MyConnect mc;
+    private Document doc;
+    private ConnectivityManager cm;
+    private NetworkInfo netInfo;
 
 
     //Functions
@@ -46,6 +51,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         initViews();
         restText.setText("");
+        error = "";
+
+        cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        netInfo = cm.getActiveNetworkInfo();
+
+        mc = new MyConnect();
+        mc.execute(URI);
     }
 
     //инициализация вьюшек
@@ -65,16 +77,49 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     //обработка нажатия кнопки
     @Override
     public void onClick(View v) {
-        DownloadTimeTableThread dttt = new DownloadTimeTableThread(this);
-        dttt.execute("http://91.232.173.137:8083/izmenenie/izmenenie.html", tvInputSearchText.getText().toString());
+        if (doc == null) return;
+        //поиск введенного текста в doc
+        dttt = new DownloadTimeTableThread(this);
+        dttt.execute(tvInputSearchText.getText().toString(), doc);
     }
 
     //проверка подключения к интернету
     public boolean isOnline() {
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return (netInfo != null && netInfo.isConnectedOrConnecting()) ? true : false;
+    }
 
-        if (netInfo != null && netInfo.isConnectedOrConnecting()) return true;
-        return false;
+
+    //inner class connect
+    class MyConnect extends AsyncTask<String, Void, Document> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            textError.setText(error);
+        }
+
+        @Override
+        protected Document doInBackground(String... params) {
+            if (!isOnline()) {
+                error = "Отсутствует подключение к интернету!";
+                return null;
+            }
+
+            try {
+                return Jsoup.connect(params[0]).get();
+            } catch (IOException e) {
+                error = "Неверный URI!";
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Document document) {
+            super.onPostExecute(document);
+            textError.setText(error);
+            error = "";
+            doc = document;
+        }
     }
 }
